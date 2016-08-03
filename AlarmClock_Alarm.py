@@ -9,6 +9,7 @@ Created by Christopher Beard on 16-07-2016.
 Copyright (c) 2016 notice: 
 This code is shared under the Creative Commons Attribution-ShareAlike
 4.0 International Public License 
+It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 """
 
 from time import sleep
@@ -41,8 +42,7 @@ def GPIO_Call(Buzzer, LEDFlash):
     except:
         print 'Error in Function GPIO_Call'
     finally:
-        GPIO.cleanup() 
-    
+        GPIO.cleanup()    
 
 def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, AlarmHappened):
     """
