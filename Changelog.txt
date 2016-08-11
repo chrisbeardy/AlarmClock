@@ -1,0 +1,5 @@
+Changelog
+
+1 - setup gpio output ports
+2 - Added functions to convert time to time in seconds
+3 - added GPIO interupt for IR inputs
