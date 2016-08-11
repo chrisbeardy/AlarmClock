@@ -16,33 +16,77 @@ from time import sleep
 import AlarmClock_Screen
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(port, GPIO.OUT, [initial=0]) #set ports later
+GPIO.setup(port, GPIO.OUT, [initial=0])
+GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
+GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
+
+
+def Get_ActualTime_in_Seconds():
+    """
+    Get_ActualTime_in_Seconds Function:
+    Function gets actual time from AlarmClock_Screen Script and then converts to seconds
+
+    Args: None
+
+    Returns: ActualTime_in_seconds
+    """
+    try:
+        ActualTime = AlarmClock_Screen.Get_ActualTime()  # get as dictionary object Hour,Mins,Secs
+        ActualTime_in_seconds = ((ActualTime[H]*60*60) + (ActualTime[M]*60) + ActualTime[S])
+        return ActualTime_in_seconds
+    except KeyboardInterrupt:
+        print ('KeyboardInterrupt in Function Get_ActualTime_in_Seconds')
+    except:
+        print ('Error in Function Get_ActualTime_in_Seconds')
+    finally:
+        GPIO.cleanup()
+
+def Get_AlarmTime_in_Seconds(Alarm_Number):
+    """
+    Get_AlarmTime_in_Seconds Function:
+    Function gets alarm time from AlarmClock_Screen Script and then converts to seconds
+
+    Args: Alarm_Number
+
+    Returns: AlarmTime_in_seconds
+    """
+    try:
+        AlarmTime = AlarmClock_Screen.Get_AlarmTime(Alarm_Number)  # get as dictionary object Hour,Mins,Secs
+        AlarmTime_in_seconds = ((AlarmTime[H]*60*60) + (AlarmTime[M]*60) + AlarmTime[S])
+        return AlarmTime_in_seconds
+    except KeyboardInterrupt:
+        print ('KeyboardInterrupt in Function Get_AlarmTime_in_Seconds')
+    except:
+        print ()'Error in Function Get_AlarmTime_in_Seconds')
+    finally:
+        GPIO.cleanup()
 
 def GPIO_Call(Buzzer, LEDFlash):
     """
-    GPIO_Call Fucntion:
+    GPIO_Call Function:
     Take in Booleans and sets corresponding GPIO Outputs
 
     Args:Buzzer, LEDFlash
  
     Returns: None 
-    """
-    # set up GPIO
+    """    
     try:
         if Buzzer:
-            pass # set GPIO true 
+            GPIO.output(port, 1) #set port later 
         else:
-            pass # set GPIO false
+            GPIO.output(port, 0)
 
         if LEDFlash:
-            pass # set GPIO True
+            GPIO.output(port, 1)
         else:
-            pass # set GPIO False
+            GPIO.output(port, 0)
     except KeyboardInterrupt:
-        print 'KeyboardInterrupt in Function GPIO_Call'
+        print ('KeyboardInterrupt in Function GPIO_Call')
     except:
-        print 'Error in Function GPIO_Call'
+        print ('Error in Function GPIO_Call')
     finally:
-        GPIO.cleanup()    
+        GPIO.cleanup()
 
 def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, AlarmHappened):
     """
@@ -52,8 +96,7 @@ def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, Al
     Args: AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, AlarmHappened
 
     Returns: AlarmHappened, AlarmButtonPressed, LEDFlash, Buzzer
-    """
-    
+    """    
     try:
         # if the alarm has gone off and then the user deactivates it sleep for 20 mins 
         if AlarmButtonPressed and AlarmHappened:
@@ -116,12 +159,17 @@ def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, Al
         return [AlarmHappened, AlarmButtonPressed, LEDFlash, Buzzer]
 
     except KeyboardInterrupt:
-        print "Keyboard Interruption in Alarm_Active"
+        print ("Keyboard Interruption in Alarm_Active")
     except:
-        print "Error in Alarm_Active Function on AlarmClock_Alarm"
+        print ()"Error in Alarm_Active Function on AlarmClock_Alarm")
     finally:
         GPIO.cleanup()
 
+def F_Alarm1ButtonPressed(Alarm1ButtonPressed):
+    return Alarm1ButtonPressed = True
+
+def F_Alarm2ButtonPressed(Alarm2ButtonPressed):
+    return Alarm2ButtonPressed = True
 
 def main():
     """
@@ -140,34 +188,30 @@ def main():
 
     try:
         while True:
-            if AlarmClock_Screen.Alarm1Active:
+            if AlarmClock_Screen.Alarm1Active:  #possibly can't do this, would need to have function
                 Alarm_Number = 1
-                Alarm1Time = AlarmClock_Screen.Get_AlarmTime(Alarm_Number)
-                ActualTime = AlarmClock_Screen.Get_ActualTime()
-                AlarmButtonGPIO = None # Assign Later
-                #set up input GPIO as interupt if high then set Alarm1ButtonPressed = True
-                #call function
+                Alarm1Time = Get_AlarmTime_in_Seconds(Alarm_Number)
+                ActualTime = Get_ActualTime_in_Seconds()
+                GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm1ButtonPressed, bouncetime=300)
                 [Alarm1_Happened, Alarm1ButtonPressed, LEDFlash, Buzzer] = Alarm_Active(Alarm1Time, ActualTime, \
-                    Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened) # check syntax
+                    Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened)
             else:
                 sleep(0.25) #preserve processor
                 
             if AlarmClock_Screen.Alarm2Active:
                 Alarm_Number = 2
-                Alarm2Time = AlarmClock_Screen.Get_AlarmTime(Alarm_Number)
-                ActualTime = AlarmClock_Screen.Get_ActualTime()
-                AlarmButtonGPIO = None # Assign Later
-                #set up input GPIO as interupt if high then set Alarm1ButtonPressed = True
-                #call function
+                Alarm2Time = Get_AlarmTime_in_Seconds(Alarm_Number)
+                ActualTime = Get_ActualTime_in_Seconds()
+                GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm2ButtonPressed, bouncetime=300)
                 [Alarm2_Happened, Alarm2ButtonPressed, LEDFlash, Buzzer] = Alarm_Active(Alarm2Time, ActualTime, \
-                    Alarm2ButtonPressed, LEDFlash, Buzzer, Alarm2_Happened) # check syntax
+                    Alarm2ButtonPressed, LEDFlash, Buzzer, Alarm2_Happened) 
             else:
                 sleep(0.25) #preserve processor
 
     except KeyboardInterrupt:
-        print "Keyboard Interuption in main"
+        print ("Keyboard Interuption in main")
     except:
-        print "Error in Main of AlarmClock_Alarm"
+        print ("Error in Main of AlarmClock_Alarm")
     finally:
         GPIO.cleanup()
 
