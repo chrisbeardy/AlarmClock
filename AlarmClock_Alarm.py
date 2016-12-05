@@ -6,14 +6,15 @@ Script 2 of 2 from AlarmClock Project:
 Script for comparing alarm time to actual time, triggering the alarm and disabling the alarm
 
 Created by Christopher Beard on 16-07-2016.
-Copyright (c) 2016 notice: 
+Copyright (c) 2016 notice:
 This code is shared under the Creative Commons Attribution-ShareAlike
-4.0 International Public License 
+4.0 International Public License
 It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 """
 
 from time import sleep
 import AlarmClock_Screen
+import pickle
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(port, GPIO.OUT, [initial=0]) #set ports later
@@ -52,13 +53,23 @@ def Get_AlarmTime_in_Seconds(Alarm_Number):
     Returns: AlarmTime_in_seconds
     """
     try:
-        AlarmTime = AlarmClock_Screen.Get_AlarmTime(Alarm_Number)  # get as dictionary object Hour,Mins,Secs
+        #use pickle to get data from other script
+        if Alarm_Number == 1:
+            with open('AlarmTime1.pickle', 'rb') as f:
+            #get as dictionary object
+            AlarmTime = pickle.load(f)
+        elif Alarm_Number == 2:
+            with open('AlarmTime2.pickle', 'rb') as f:
+            AlarmTime = pickle.load(f)
+        else:
+            print ('AlarmNumber passed to Function Get_AlarmTime_in_Seconds not valid ')
+
         AlarmTime_in_seconds = ((AlarmTime[H]*60*60) + (AlarmTime[M]*60) + AlarmTime[S])
         return AlarmTime_in_seconds
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_AlarmTime_in_Seconds')
     except:
-        print ()'Error in Function Get_AlarmTime_in_Seconds')
+        print ('Error in Function Get_AlarmTime_in_Seconds')
     finally:
         GPIO.cleanup()
 
@@ -68,12 +79,12 @@ def GPIO_Call(Buzzer, LEDFlash):
     Take in Booleans and sets corresponding GPIO Outputs
 
     Args:Buzzer, LEDFlash
- 
-    Returns: None 
-    """    
+
+    Returns: None
+    """
     try:
         if Buzzer:
-            GPIO.output(port, 1) #set port later 
+            GPIO.output(port, 1) #set port later
         else:
             GPIO.output(port, 0)
 
@@ -96,23 +107,23 @@ def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, Al
     Args: AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, AlarmHappened
 
     Returns: AlarmHappened, AlarmButtonPressed, LEDFlash, Buzzer
-    """    
+    """
     try:
-        # if the alarm has gone off and then the user deactivates it sleep for 20 mins 
+        # if the alarm has gone off and then the user deactivates it sleep for 20 mins
         if AlarmButtonPressed and AlarmHappened:
             Buzzer = False
             LEDFlash = False
             AlarmHappened = False
-            AlarmButtonPressed = False   
-            GPIO_Call(Buzzer, LEDFlash)                     
+            AlarmButtonPressed = False
+            GPIO_Call(Buzzer, LEDFlash)
             sleep(20*60) #20 mins in seconds
-        # If actual time is greater than the alarm time + 10 mins from above e.g. 03:00 > 02:40 then 
-        # the alarm can never go off as 24hr clock so actual time will cycle round at midnight 
+        # If actual time is greater than the alarm time + 10 mins from above e.g. 03:00 > 02:40 then
+        # the alarm can never go off as 24hr clock so actual time will cycle round at midnight
         elif ActualTime >= (AlarmTime + (10*60)):
             AlarmHappened = False
             Buzzer = False
             LEDFlash = False
-            GPIO_Call(Buzzer, LEDFlash)            
+            GPIO_Call(Buzzer, LEDFlash)
             sleep(0.25) # preserve processor
         # Set condition for if alarm has gone off and user hasnt deactivated after 10 secs of beeping and 2 min silence
         elif (ActualTime >= (AlarmTime + (2*60))) and (ActualTime < (AlarmTime + (10*60))):
@@ -123,7 +134,7 @@ def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, Al
                 Buzzer = True
                 LEDFlash = True
             GPIO_Call(Buzzer, LEDFlash)
-            sleep(1)            
+            sleep(1)
         # set condition for 30 secs before alarm time
         elif (ActualTime >= (AlarmTime - 30)) and (ActualTime < (AlarmTime - 10)):
             AlarmHappened = True
@@ -142,9 +153,9 @@ def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, Al
                 LEDFlash = False
             elif not Buzzer:
                 Buzzer = True
-                LEDFlash = True                
+                LEDFlash = True
             GPIO_Call(Buzzer, LEDFlash)
-            sleep(1)            
+            sleep(1)
         # set condition for 2 min slience period of alarm
         elif (ActualTime >= AlarmTime) and (ActualTime < (AlarmTime + (2*60))):
             AlarmHappened = True
@@ -174,21 +185,25 @@ def F_Alarm2ButtonPressed(Alarm2ButtonPressed):
 def main():
     """
     Main Funtion:
-    Runs in constant while loop checking status of alarm (on/off), 
+    Runs in constant while loop checking status of alarm (on/off),
     If alarm on it calls Alarm_Active function
     """
     #set up initial variables
     Alarm1_Happened = False  # Can you do arrays python or does list work?
     Alarm2_Happened = False
     Alarm1ButtonPressed = False # IR Button Input for deactivating alarm
-    Alarm2ButtonPressed = False 
+    Alarm2ButtonPressed = False
     LEDFlash = False
     Buzzer = False
     Alarm_Number = None
 
     try:
         while True:
-            if AlarmClock_Screen.Alarm1Active:  #possibly can't do this, would need to have function
+            with open('Alarm1Active.pickle' , 'rb') as A1:
+                Alarm1Active = pickle.load(A1)
+
+            if Alarm1Active:  #possibly can't do this, would need to have function
+            #can't do this, needs to be pickle get
                 Alarm_Number = 1
                 Alarm1Time = Get_AlarmTime_in_Seconds(Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
@@ -197,14 +212,16 @@ def main():
                     Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened)
             else:
                 sleep(0.25) #preserve processor
-                
-            if AlarmClock_Screen.Alarm2Active:
+
+            with open('Alarm2Active.pickle' , 'rb') as A2:
+                Alarm1Active = pickle.load(A2)
+            if Alarm2Active:
                 Alarm_Number = 2
                 Alarm2Time = Get_AlarmTime_in_Seconds(Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
                 GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm2ButtonPressed, bouncetime=300)
                 [Alarm2_Happened, Alarm2ButtonPressed, LEDFlash, Buzzer] = Alarm_Active(Alarm2Time, ActualTime, \
-                    Alarm2ButtonPressed, LEDFlash, Buzzer, Alarm2_Happened) 
+                    Alarm2ButtonPressed, LEDFlash, Buzzer, Alarm2_Happened)
             else:
                 sleep(0.25) #preserve processor
 
