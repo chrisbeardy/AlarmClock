@@ -17,9 +17,9 @@ from datetime import datetime
 import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
+import CHIP_IO.GPIO as GPIO
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
 #set initial background colour
@@ -29,6 +29,8 @@ lcd.set_backlight(0)
 #intialise temp sensor
 sensor = MCP9808.MCP9808()
 sensor.begin()
+
+
 
 def Get_Temperature():
     """
@@ -110,7 +112,7 @@ def F_BackLightON():
         GPIO.cleanup()
 
 
-def F_AlarmOnOff(AlarmActive):
+def F_AlarmOnOff(AlarmActive, Alarm_Number):
     """
     AlarmActive function:
     Function to enable and disable alarm when button is pressed as well as
@@ -125,7 +127,7 @@ def F_AlarmOnOff(AlarmActive):
             AlarmActive = False
             lcd.set_backlight(1)
             lcd.clear()
-            lcd.message('Alarm Disabled')
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Disabled')
             sleep(2)
             lcd.clear()
             lcd.set_backlight(0)
@@ -134,7 +136,7 @@ def F_AlarmOnOff(AlarmActive):
             AlarmActive = True
             lcd.set_backlight(1)
             lcd.clear()
-            lcd.message('Alarm Enabled')
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Enabled')
             sleep(2)
             lcd.clear()
             lcd.set_backlight(0)
@@ -150,30 +152,36 @@ def main():
     Runs continously calling appropriate functions to set screens depending on buttons pressed
     """
     try:
-        buttons = (LCD.SELECT, LCD.UP, LCD.DOWN, LCD.RIGHT, LCD.LEFT)
+        #Intialise variables
+        Alarm1Active = False
+        Alarm2Active = False
 
         while True:
-            for button in buttons:
-                if lcd.is_pressed(button):
-                    Button_Pressed = True
-            if Button_Pressed:
-                break
-            #Main Screen
-            ActualTime, ActualTimeDisplay = Get_ActualTime()
-            date = Get_Date()
-            temp = Get_Temperature()
-            lcd.set_cursor(0,0)
-            lcd.message(ActualTimeDisplay)
-            lcd.set_cursor(12,0)
-            lcd.message(temp + chr(223) + 'C') #chr(223) is degree sign
-            lcd.set_cursor(3,1)
-            lcd.message(date)
-            sleep(0.5)
-            #trigger event for backlight
-            GPIO.add_event_detect(port, GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
-            #tigger event for enabling/disabling first alarm
-            GPIO.add_event_detect(port, GPIO.RISING, callback=F_AlarmOnOff(Alarm1Active), bouncetime=300)
-            #setup pickles here
+            if lcd.is_pressed(LCD.SELECT):
+                F_BackLightON()
+            elif lcd.is_pressed(LCD.UP):
+                Alarm1Active = F_AlarmOnOff(Alarm1Active, 1)
+            elif lcd.is_pressed(LCD.DOWN):
+                Alarm2Active = F_AlarmOnOff(Alarm2Active, 2)
+            else:
+                #Main Screen
+                ActualTime, ActualTimeDisplay = Get_ActualTime()
+                date = Get_Date()
+                temp = Get_Temperature()
+                lcd.set_cursor(0,0)
+                lcd.message(ActualTimeDisplay)
+                lcd.set_cursor(12,0)
+                lcd.message(temp + chr(223) + 'C') #chr(223) is degree sign
+                lcd.set_cursor(3,1)
+                lcd.message(date)
+                sleep(0.5)
+
+
+            # #trigger event for backlight
+            # GPIO.add_event_detect(port, GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
+            # #tigger event for enabling/disabling first alarm
+            # GPIO.add_event_detect(port, GPIO.RISING, callback=F_AlarmOnOff(Alarm1Active), bouncetime=300)
+            # #setup pickles here
 
     except KeyboardInterrupt:
         print('KeyboardInterrupt in Main')

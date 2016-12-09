@@ -38,8 +38,6 @@ def Get_ActualTime_in_Seconds():
         return ActualTime_in_seconds
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_ActualTime_in_Seconds')
-    except:
-        print ('Error in Function Get_ActualTime_in_Seconds')
     finally:
         GPIO.cleanup()
 
@@ -68,8 +66,6 @@ def Get_AlarmTime_in_Seconds(Alarm_Number):
         return AlarmTime_in_seconds
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_AlarmTime_in_Seconds')
-    except:
-        print ('Error in Function Get_AlarmTime_in_Seconds')
     finally:
         GPIO.cleanup()
 
@@ -94,14 +90,12 @@ def GPIO_Call(Buzzer, LEDFlash):
             GPIO.output(port, 0)
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function GPIO_Call')
-    except:
-        print ('Error in Function GPIO_Call')
     finally:
         GPIO.cleanup()
 
-def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, AlarmHappened):
+def F_Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, AlarmHappened):
     """
-    Alarm_Active Function:
+    F_Alarm_Active Function:
     Takes in Alarm parameters the triggers alarm at correct time
 
     Args: AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, AlarmHappened
@@ -170,9 +164,7 @@ def Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, Al
         return [AlarmHappened, AlarmButtonPressed, LEDFlash, Buzzer]
 
     except KeyboardInterrupt:
-        print ("Keyboard Interruption in Alarm_Active")
-    except:
-        print ()"Error in Alarm_Active Function on AlarmClock_Alarm")
+        print ("Keyboard Interruption in F_Alarm_Active")
     finally:
         GPIO.cleanup()
 
@@ -186,7 +178,7 @@ def main():
     """
     Main Funtion:
     Runs in constant while loop checking status of alarm (on/off),
-    If alarm on it calls Alarm_Active function
+    If alarm on it calls F_Alarm_Active function
     """
     #set up initial variables
     Alarm1_Happened = False
@@ -207,28 +199,26 @@ def main():
                 Alarm1Time = Get_AlarmTime_in_Seconds(Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
                 GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm1ButtonPressed(Alarm1ButtonPressed), bouncetime=300)
-                [Alarm1_Happened, Alarm1ButtonPressed, LEDFlash, Buzzer] = Alarm_Active(Alarm1Time, ActualTime, \
+                [Alarm1_Happened, Alarm1ButtonPressed, LEDFlash, Buzzer] = F_Alarm_Active(Alarm1Time, ActualTime, \
                     Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened)
             else:
-                sleep(0.25) #preserve processor
+                sleep(0.5) #preserve processor
 
             with open('Alarm2Active.pickle' , 'rb') as A2:
                 Alarm1Active = pickle.load(A2)
-                
+
             if Alarm2Active:
                 Alarm_Number = 2
                 Alarm2Time = Get_AlarmTime_in_Seconds(Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
                 GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm2ButtonPressed(Alarm2ButtonPressed), bouncetime=300)
-                [Alarm2_Happened, Alarm2ButtonPressed, LEDFlash, Buzzer] = Alarm_Active(Alarm2Time, ActualTime, \
+                [Alarm2_Happened, Alarm2ButtonPressed, LEDFlash, Buzzer] = F_Alarm_Active(Alarm2Time, ActualTime, \
                     Alarm2ButtonPressed, LEDFlash, Buzzer, Alarm2_Happened)
             else:
-                sleep(0.25) #preserve processor
+                sleep(0.5) #preserve processor
 
     except KeyboardInterrupt:
         print ("Keyboard Interuption in main")
-    except:
-        print ("Error in Main of AlarmClock_Alarm")
     finally:
         GPIO.cleanup()
 
