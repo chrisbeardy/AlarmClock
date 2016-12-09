@@ -58,5 +58,9 @@ def Get_ActualTime():
     ActualTime = {'H':Hour, 'M':Min, 'S':Sec}
     return ActualTime, ActualTimeDisplay
 
+def Get_Date():
+    Date = datetime.now().strftime('%a %d %b')
+    return Date
+
 def Get_AlarmTime(Alarm_Number):
     pass
