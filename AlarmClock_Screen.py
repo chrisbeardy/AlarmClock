@@ -125,7 +125,7 @@ def F_AlarmOnOff(AlarmActive):
             AlarmActive = False
             lcd.set_backlight(1)
             lcd.clear()
-            lcd.message('Alarm Disabled')
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Disabled')
             sleep(2)
             lcd.clear()
             lcd.set_backlight(0)
@@ -134,13 +134,13 @@ def F_AlarmOnOff(AlarmActive):
             AlarmActive = True
             lcd.set_backlight(1)
             lcd.clear()
-            lcd.message('Alarm Enabled')
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Enabled')
             sleep(2)
             lcd.clear()
             lcd.set_backlight(0)
             return AlarmActive
     except KeyboardInterrupt:
-        print ('KeyboardInterrupt in Function F_BackLightON')
+        print ('KeyboardInterrupt in Function F_AlarmOnOff')
     finally:
         GPIO.cleanup()
 
@@ -168,13 +168,20 @@ def main():
             lcd.message(temp + chr(223) + 'C') #chr(223) is degree sign
             lcd.set_cursor(3,1)
             lcd.message(date)
-            sleep(0.5)
+            sleep(0.25)
             #trigger event for backlight
             GPIO.add_event_detect(port, GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
             #tigger event for enabling/disabling first alarm
             GPIO.add_event_detect(port, GPIO.RISING, callback=F_AlarmOnOff(Alarm1Active), bouncetime=300)
+            #tigger event for enabling/disabling second alarm
+            GPIO.add_event_detect(port, GPIO.RISING, callback=F_AlarmOnOff(Alarm2Active), bouncetime=300)
             #setup pickles here
-
+            with open('Alarm1Active.pickle', 'wb') as f:
+                # Pickle the 'data' using the highest protocol available.
+                pickle.dump(Alarm1Active, f, pickle.HIGHEST_PROTOCOL)
+            with open('Alarm2Active.pickle', 'wb') as f2:
+                # Pickle the 'data' using the highest protocol available.
+                pickle.dump(Alarm2TimeActive, f2, pickle.HIGHEST_PROTOCOL)
     except KeyboardInterrupt:
         print('KeyboardInterrupt in Main')
     finally:

@@ -174,7 +174,7 @@ def main():
                 lcd.message(temp + chr(223) + 'C') #chr(223) is degree sign
                 lcd.set_cursor(3,1)
                 lcd.message(date)
-                sleep(0.5)
+                sleep(0.25)
 
 
             # #trigger event for backlight
@@ -182,7 +182,9 @@ def main():
             # #tigger event for enabling/disabling first alarm
             # GPIO.add_event_detect(port, GPIO.RISING, callback=F_AlarmOnOff(Alarm1Active), bouncetime=300)
             # #setup pickles here
-
+            with open('Alarm1Active.pickle', 'wb') as f:
+                # Pickle the 'data' using the highest protocol available.
+                pickle.dump(Alarm1Active, f, pickle.HIGHEST_PROTOCOL)
     except KeyboardInterrupt:
         print('KeyboardInterrupt in Main')
     finally:
