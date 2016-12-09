@@ -13,10 +13,12 @@ This code is shared under the Creative Commons Attribution-ShareAlike
 It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 """
 from time import sleep
+import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
 #set initial background colour
@@ -94,9 +96,27 @@ def Get_Date():
 def Get_AlarmTime(Alarm_Number):
     pass
 
+def F_BackLightON():
+    lcd.set_backlight(1)
+    sleep(10)
+    lcd.set_backlight(0)
 
 def main:
-    pass
-    
+    """
+    Main Function:
+    Runs continously calling appropriate functions to set screens depending on buttons pressed
+    """
+    try:
+        while True:
+            #trigger event for backlight
+            GPIO.add_event_detect(port, GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
+            
+    except KeyboardInterrupt:
+        print('KeyboardInterrupt in Main')
+    except:
+        print('Error in Main')
+    finally:
+        GPIO.cleanup()
+
 if __name__ == '__main__':
     main()

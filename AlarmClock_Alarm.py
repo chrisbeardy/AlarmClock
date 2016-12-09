@@ -214,6 +214,7 @@ def main():
 
             with open('Alarm2Active.pickle' , 'rb') as A2:
                 Alarm1Active = pickle.load(A2)
+                
             if Alarm2Active:
                 Alarm_Number = 2
                 Alarm2Time = Get_AlarmTime_in_Seconds(Alarm_Number)

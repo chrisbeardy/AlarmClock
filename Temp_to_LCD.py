@@ -9,6 +9,7 @@ lcd = LCD.Adafruit_CharLCDPlate()
 
 #set initial background colour
 lcd.set_color(1.0,0.0,1.0) # blue LCD only
+lcd.set_backlight(0)
 
 #intialise temp sensor
 sensor = MCP9808.MCP9808()
@@ -48,8 +49,16 @@ def Get_Date():
     Date = datetime.now().strftime('%a %d %b')
     return Date
 
+def F_BackLightON():
+    lcd.set_backlight(1)
+    sleep(10)
+    lcd.set_backlight(0)
+
 #main
 while True:
+    if lcd.is_pressed(LCD.SELECT):
+        F_BackLightON()
+
     ActualTime, ActualTimeDisplay = Get_ActualTime()
     ActualTime_in_seconds = ((ActualTime['H']*60*60) + (ActualTime['M']*60) + ActualTime['S'])
     date = Get_Date()
@@ -60,4 +69,4 @@ while True:
     lcd.message(temp + chr(223) + 'C') #chr(223) is degree sign
     lcd.set_cursor(3,1)
     lcd.message(date)
-    sleep(1.0)
+    sleep(0.5)
