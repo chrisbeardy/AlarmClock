@@ -12,10 +12,23 @@ This code is shared under the Creative Commons Attribution-ShareAlike
 4.0 International Public License
 It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 """
-import time
+from time import sleep
+import Adafruit_CharLCD as LCD
+import Adafruit_MCP9808.MCP9808 as MCP9808
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
+#intialise LCD
+lcd = LCD.Adafruit_CharLCDPlate()
 
+#set initial background colour
+lcd.set_color(1.0,0.0,1.0) # blue LCD only
+
+#set background off intially, need GPIO Interuption# to set high
+lcd.set_backlight(0)
+
+#intialise temp sensor
+sensor = MCP9808.MCP9808()
+sensor.begin()
 
 def Get_Temperature():
     """
