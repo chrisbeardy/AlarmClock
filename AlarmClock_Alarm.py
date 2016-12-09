@@ -206,7 +206,7 @@ def main():
                 Alarm_Number = 1
                 Alarm1Time = Get_AlarmTime_in_Seconds(Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
-                GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm1ButtonPressed, bouncetime=300)
+                GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm1ButtonPressed(Alarm1ButtonPressed), bouncetime=300)
                 [Alarm1_Happened, Alarm1ButtonPressed, LEDFlash, Buzzer] = Alarm_Active(Alarm1Time, ActualTime, \
                     Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened)
             else:
@@ -218,7 +218,7 @@ def main():
                 Alarm_Number = 2
                 Alarm2Time = Get_AlarmTime_in_Seconds(Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
-                GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm2ButtonPressed, bouncetime=300)
+                GPIO.add_event_detect(port, GPIO.RISING, callback=F_Alarm2ButtonPressed(Alarm2ButtonPressed), bouncetime=300)
                 [Alarm2_Happened, Alarm2ButtonPressed, LEDFlash, Buzzer] = Alarm_Active(Alarm2Time, ActualTime, \
                     Alarm2ButtonPressed, LEDFlash, Buzzer, Alarm2_Happened)
             else:
