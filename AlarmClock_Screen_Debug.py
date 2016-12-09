@@ -90,8 +90,20 @@ def Get_Date():
     finally:
         GPIO.cleanup()
 
-def Get_AlarmTime(Alarm_Number):
-    pass
+def Set_AlarmTime(Hour, Min, Sec, Alarm_Number):
+    lcd.set_backlight(1)
+    lcd.clear()
+    lcd.message('Current Alarm ' + str(Alarm_Number) + ' Time:\n' )
+    lcd.message(str(Hour)+':'+str(Min)+':'+str(Sec))
+    sleep(2)
+    lcd.clear()
+    lcd.set_backlight(0)
+    return Hour, Min, Sec
+
+def Get_AlarmTime(Hour, Min, Sec, Alarm_Number):
+    #convert to dictionary
+    AlarmTime = {'H':Hour, 'M':Min, 'S':Sec}
+    return AlarmTime
 
 def F_BackLightON():
     """
@@ -155,6 +167,9 @@ def main():
         #Intialise variables
         Alarm1Active = False
         Alarm2Active = False
+        Hour1 = 1
+        Min1 = 1
+        Sec1 = 1
 
         while True:
             if lcd.is_pressed(LCD.SELECT):
@@ -163,6 +178,8 @@ def main():
                 Alarm1Active = F_AlarmOnOff(Alarm1Active, 1)
             elif lcd.is_pressed(LCD.DOWN):
                 Alarm2Active = F_AlarmOnOff(Alarm2Active, 2)
+            elif lcd.is_pressed(LCD.LEFT):
+                Hour1, Min1, Sec1 = Set_AlarmTime(Hour1, Min1, Sec1, 1)
             else:
                 #Main Screen
                 ActualTime, ActualTimeDisplay = Get_ActualTime()
@@ -185,6 +202,11 @@ def main():
             with open('Alarm1Active.pickle', 'wb') as f:
                 # Pickle the 'data' using the highest protocol available.
                 pickle.dump(Alarm1Active, f, pickle.HIGHEST_PROTOCOL)
+            with open('AlarmTime1.pickle.pickle', 'wb') as f:
+                AlarmTime1 = Get_AlarmTime(Hour1, Min1, Sec1, 1)
+                print(AlarmTime1)
+                # Pickle the 'data' using the highest protocol available.
+                pickle.dump(AlarmTime1, f, pickle.HIGHEST_PROTOCOL)
     except KeyboardInterrupt:
         print('KeyboardInterrupt in Main')
     finally:
