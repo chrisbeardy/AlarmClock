@@ -1,4 +1,5 @@
-from time import sleep
+from time import sleep, strftime
+from datetime import datetime
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import CHIP_IO.GPIO as GPIO
@@ -25,7 +26,7 @@ def Get_Temperature():
     """
     try:
         temp = sensor.readTempC()
-        temp = str('%.2f' % temp) # convert to string of 2 decimal places
+        temp = str('%.0f' % temp) # convert to string of 0 decimal places
         return temp
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_Temperature')
@@ -34,9 +35,29 @@ def Get_Temperature():
     finally:
         GPIO.cleanup()
 
+#fucntion to get system time
+def Get_ActualTime():
+    ActualTimeDisplay = datetime.now().strftime('%H:%M')
+    Hour = int(datetime.now().strftime('%H'))
+    Min = int(datetime.now().strftime('%M'))
+    Sec = int(datetime.now().strftime('%S'))
+    ActualTime = {'H':Hour, 'M':Min, 'S':Sec}
+    return ActualTime, ActualTimeDisplay
+
+def Get_Date():
+    Date = datetime.now().strftime('%a %d %b')
+    return Date
+
 #main
 while True:
+    ActualTime, ActualTimeDisplay = Get_ActualTime()
+    ActualTime_in_seconds = ((ActualTime['H']*60*60) + (ActualTime['M']*60) + ActualTime['S'])
+    date = Get_Date()
     temp = Get_Temperature()
-    lcd.clear()
+    lcd.set_cursor(0,0)
+    lcd.message(ActualTimeDisplay)
+    lcd.set_cursor(12,0)
     lcd.message(temp + chr(223) + 'C') #chr(223) is degree sign
-    sleep(5.0)
+    lcd.set_cursor(3,1)
+    lcd.message(date)
+    sleep(1.0)

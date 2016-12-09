@@ -41,7 +41,7 @@ def Get_Temperature():
     """
     try:
         temp = sensor.readTempC()
-        temp = str('%.2f' % temp) # convert to string of 2 decimal places
+        temp = str('%.0f' % temp) # convert to string of 0 decimal places
         return temp
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_Temperature')
@@ -51,7 +51,12 @@ def Get_Temperature():
         GPIO.cleanup()
 
 def Get_ActualTime():
-    pass
+    ActualTimeDisplay = datetime.now().strftime('%H:%M')
+    Hour = int(datetime.now().strftime('%H'))
+    Min = int(datetime.now().strftime('%M'))
+    Sec = int(datetime.now().strftime('%S'))
+    ActualTime = {'H':Hour, 'M':Min, 'S':Sec}
+    return ActualTime, ActualTimeDisplay
 
 def Get_AlarmTime(Alarm_Number):
     pass

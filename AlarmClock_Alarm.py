@@ -33,8 +33,8 @@ def Get_ActualTime_in_Seconds():
     Returns: ActualTime_in_seconds
     """
     try:
-        ActualTime = AlarmClock_Screen.Get_ActualTime()  # get as dictionary object Hour,Mins,Secs
-        ActualTime_in_seconds = ((ActualTime[H]*60*60) + (ActualTime[M]*60) + ActualTime[S])
+        ActualTime, ActualTimeDisplay = AlarmClock_Screen.Get_ActualTime()  # get as dictionary object Hour,Mins,Secs
+        ActualTime_in_seconds = ((ActualTime['H']*60*60) + (ActualTime['M']*60) + ActualTime['S'])
         return ActualTime_in_seconds
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_ActualTime_in_Seconds')
@@ -64,7 +64,7 @@ def Get_AlarmTime_in_Seconds(Alarm_Number):
         else:
             print ('AlarmNumber passed to Function Get_AlarmTime_in_Seconds not valid ')
 
-        AlarmTime_in_seconds = ((AlarmTime[H]*60*60) + (AlarmTime[M]*60) + AlarmTime[S])
+        AlarmTime_in_seconds = ((AlarmTime['H']*60*60) + (AlarmTime['M']*60) + AlarmTime['S'])
         return AlarmTime_in_seconds
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_AlarmTime_in_Seconds')
