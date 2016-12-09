@@ -19,13 +19,10 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
-
 #set initial background colour
 lcd.set_color(1.0,0.0,1.0) # blue LCD only
-
-#set background off intially, need GPIO Interuption# to set high
+#set background off intially, need GPIO event to set high
 lcd.set_backlight(0)
-
 #intialise temp sensor
 sensor = MCP9808.MCP9808()
 sensor.begin()
@@ -51,16 +48,55 @@ def Get_Temperature():
         GPIO.cleanup()
 
 def Get_ActualTime():
-    ActualTimeDisplay = datetime.now().strftime('%H:%M')
-    Hour = int(datetime.now().strftime('%H'))
-    Min = int(datetime.now().strftime('%M'))
-    Sec = int(datetime.now().strftime('%S'))
-    ActualTime = {'H':Hour, 'M':Min, 'S':Sec}
-    return ActualTime, ActualTimeDisplay
+    """
+    Get_ActualTime Function:
+    Function to get the actual time from the system, then seperate into
+    a time for the display and a dictionary item for the time in
+    individual hours, minutes and seconds
+
+    Args: None
+
+    Return: ActualTime,  ActualTimeDisplay
+    """
+    try:
+        ActualTimeDisplay = datetime.now().strftime('%H:%M')
+        Hour = int(datetime.now().strftime('%H'))
+        Min = int(datetime.now().strftime('%M'))
+        Sec = int(datetime.now().strftime('%S'))
+        ActualTime = {'H':Hour, 'M':Min, 'S':Sec}
+        return ActualTime, ActualTimeDisplay
+    except KeyboardInterrupt:
+        print ('KeyboardInterrupt in Function Get_ActualTime')
+    except:
+        print ('Error in Function Get_ActualTime')
+    finally:
+        GPIO.cleanup()
 
 def Get_Date():
-    Date = datetime.now().strftime('%a %d %b')
-    return Date
+    """
+    Get_Date fucntion:
+    Fucntion to get date from the system
+
+    Args: None
+
+    Return: Date
+    """
+    try:
+        Date = datetime.now().strftime('%a %d %b')
+        return Date
+    except KeyboardInterrupt:
+        print ('KeyboardInterrupt in Function Get_Date')
+    except:
+        print ('Error in Function Get_Date')
+    finally:
+        GPIO.cleanup()
 
 def Get_AlarmTime(Alarm_Number):
     pass
+
+
+def main:
+    pass
+    
+if __name__ == '__main__':
+    main()

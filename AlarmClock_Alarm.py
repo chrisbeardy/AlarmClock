@@ -189,7 +189,7 @@ def main():
     If alarm on it calls Alarm_Active function
     """
     #set up initial variables
-    Alarm1_Happened = False  # Can you do arrays python or does list work?
+    Alarm1_Happened = False
     Alarm2_Happened = False
     Alarm1ButtonPressed = False # IR Button Input for deactivating alarm
     Alarm2ButtonPressed = False
@@ -202,8 +202,7 @@ def main():
             with open('Alarm1Active.pickle' , 'rb') as A1:
                 Alarm1Active = pickle.load(A1)
 
-            if Alarm1Active:  #possibly can't do this, would need to have function
-            #can't do this, needs to be pickle get
+            if Alarm1Active:
                 Alarm_Number = 1
                 Alarm1Time = Get_AlarmTime_in_Seconds(Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
