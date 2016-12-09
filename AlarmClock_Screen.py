@@ -3,13 +3,13 @@
 AlarmClock_screen.py
 
 Script 1 of 2 from AlarmClock Project:
-Script for controlling the LCD Screen on the alarm clock, displaying time and date, 
-reading the set alarm time etc.  
+Script for controlling the LCD Screen on the alarm clock, displaying time and date,
+reading the set alarm time etc.
 
 Created by Christopher Beard on 16-07-2016.
-Copyright (c) 2016 notice: 
+Copyright (c) 2016 notice:
 This code is shared under the Creative Commons Attribution-ShareAlike
-4.0 International Public License 
+4.0 International Public License
 It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 """
 import time
@@ -24,10 +24,12 @@ def Get_Temperature():
 
     Args: None
 
-    Return: Temperature
+    Return: Temperature (as string)
     """
     try:
-        suite
+        temp = sensor.readTempC()
+        temp = str('%.2f' % temp) # convert to string of 2 decimal places
+        return temp
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_Temperature')
     except:
@@ -40,4 +42,3 @@ def Get_ActualTime():
 
 def Get_AlarmTime(Alarm_Number):
     pass
-
