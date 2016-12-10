@@ -93,9 +93,40 @@ def Get_Date():
 def Set_AlarmTime(Hour, Min, Sec, Alarm_Number):
     lcd.set_backlight(1)
     lcd.clear()
-    lcd.message('Current Alarm ' + str(Alarm_Number) + ' Time:\n' )
-    lcd.message(str(Hour)+':'+str(Min)+':'+str(Sec))
-    sleep(2)
+    lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
+    lcd.message(str(Hour)+':'+str(Min))
+    Cycle = True
+    while Cycle:
+        if lcd.is_pressed(LCD.UP):
+            Hour += 1
+            lcd.clear()
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
+            lcd.message(str(Hour)+':'+str(Min))
+        elif lcd.is_pressed(LCD.DOWN):
+            Hour -= 1
+            lcd.clear()
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
+            lcd.message(str(Hour)+':'+str(Min))
+        elif lcd.is_pressed(LCD.SELECT):
+            Cycle = False
+            sleep(0.5)
+
+    Cycle = True
+    while Cycle:
+        if lcd.is_pressed(LCD.UP):
+            Min += 1
+            lcd.clear()
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
+            lcd.message(str(Hour)+':'+str(Min))
+        elif lcd.is_pressed(LCD.DOWN):
+            Min -= 1
+            lcd.clear()
+            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
+            lcd.message(str(Hour)+':'+str(Min))
+        elif lcd.is_pressed(LCD.SELECT):
+            Cycle = False
+            sleep(0.5)
+
     lcd.clear()
     lcd.set_backlight(0)
     return Hour, Min, Sec
@@ -169,7 +200,7 @@ def main():
         Alarm2Active = False
         Hour1 = 1
         Min1 = 1
-        Sec1 = 1
+        Sec1 = 0
 
         while True:
             if lcd.is_pressed(LCD.SELECT):
@@ -202,11 +233,11 @@ def main():
             with open('Alarm1Active.pickle', 'wb') as f:
                 # Pickle the 'data' using the highest protocol available.
                 pickle.dump(Alarm1Active, f, pickle.HIGHEST_PROTOCOL)
-            with open('AlarmTime1.pickle.pickle', 'wb') as f:
+            with open('AlarmTime1.pickle', 'wb') as f3:
                 AlarmTime1 = Get_AlarmTime(Hour1, Min1, Sec1, 1)
-                print(AlarmTime1)
+                print (AlarmTime1)
                 # Pickle the 'data' using the highest protocol available.
-                pickle.dump(AlarmTime1, f, pickle.HIGHEST_PROTOCOL)
+                pickle.dump(AlarmTime1, f3, pickle.HIGHEST_PROTOCOL)
     except KeyboardInterrupt:
         print('KeyboardInterrupt in Main')
     finally:
