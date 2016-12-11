@@ -15,7 +15,7 @@ It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 from time import sleep
 import AlarmClock_Screen
 import pickle
-import CHIP_IO.GPIO as GPIO
+import RPi.GPIO as GPIO
 GPIO.setup(port, GPIO.OUT, [initial=0]) #set ports later
 GPIO.setup(port, GPIO.OUT, [initial=0])
 GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])

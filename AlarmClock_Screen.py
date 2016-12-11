@@ -17,8 +17,9 @@ from datetime import datetime
 import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
-import CHIP_IO.GPIO as GPIO
-GPIO.setup("XIO-P0", GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
 #set initial background colour
@@ -176,7 +177,7 @@ def F_BackLightON():
         GPIO.cleanup()
 
 
-def F_AlarmOnOff(AlarmActive):
+def F_AlarmOnOff(AlarmActive, Alarm_Number):
     """
     AlarmActive function:
     Function to enable and disable alarm when button is pressed as well as
@@ -252,7 +253,8 @@ def main():
                 lcd.message(date)
                 sleep(0.25)
                 #trigger event for backlight
-                GPIO.add_event_detect("XIO-P0", GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
+                GPIO.add_event_detect(port, GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
+
                 #setup pickles here to pass data to AlarmClock_Alarm.py
                 with open('Alarm1Active.pickle', 'wb') as f:
                     # Pickle the 'data' using the highest protocol available.
