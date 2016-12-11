@@ -17,9 +17,8 @@ from datetime import datetime
 import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
+import CHIP_IO.GPIO as GPIO
+GPIO.setup("XIO-P0", GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
 #set initial background colour
@@ -229,12 +228,16 @@ def main():
 
         while True:
             if lcd.is_pressed(LCD.UP):
+                #trigger event to enable/disable alarm 1
                 Alarm1Active = F_AlarmOnOff(Alarm1Active, 1)
             elif lcd.is_pressed(LCD.DOWN):
+                #trigger event to enable/disable alarm 2
                 Alarm2Active = F_AlarmOnOff(Alarm2Active, 2)
             elif lcd.is_pressed(LCD.LEFT):
+                #trigger event to set alarm 1 time
                 Hour1, Min1, Sec1 = Set_AlarmTime(Hour1, Min1, Sec1, 1)
             elif lcd.is_pressed(LCD.RIGHT):
+                #trigger event to set alarm 2 time
                 Hour2, Min2, Sec2 = Set_AlarmTime(Hour2, Min2, Sec2, 2)
             else:
                 #Main Screen
@@ -249,12 +252,8 @@ def main():
                 lcd.message(date)
                 sleep(0.25)
                 #trigger event for backlight
-                GPIO.add_event_detect(port, GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
-                #tigger event for enabling/disabling first alarm
-                GPIO.add_event_detect(port, GPIO.RISING, callback=F_AlarmOnOff(Alarm1Active), bouncetime=300)
-                #tigger event for enabling/disabling second alarm
-                GPIO.add_event_detect(port, GPIO.RISING, callback=F_AlarmOnOff(Alarm2Active), bouncetime=300)
-                #setup pickles here
+                GPIO.add_event_detect("XIO-P0", GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
+                #setup pickles here to pass data to AlarmClock_Alarm.py
                 with open('Alarm1Active.pickle', 'wb') as f:
                     # Pickle the 'data' using the highest protocol available.
                     pickle.dump(Alarm1Active, f, pickle.HIGHEST_PROTOCOL)
