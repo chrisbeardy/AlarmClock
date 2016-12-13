@@ -18,8 +18,6 @@ import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(port, GPIO.IN, [pull_up_down=GPIO.PUD_DOWN])
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
 #set initial background colour
@@ -29,6 +27,7 @@ lcd.set_backlight(0)
 #intialise temp sensor
 sensor = MCP9808.MCP9808()
 sensor.begin()
+
 
 def Get_Temperature():
     """
@@ -252,8 +251,12 @@ def main():
                 lcd.set_cursor(3,1)
                 lcd.message(date)
                 sleep(0.25)
+
                 #trigger event for backlight
-                GPIO.add_event_detect(port, GPIO.RISING, callback=F_BackLightON(), bouncetime=300)
+                GPIO.setmode(GPIO.BCM)
+                GPIO.setup(25, GPIO.IN)
+                if GPIO.input(25):
+                    F_BackLightON()
 
                 #setup pickles here to pass data to AlarmClock_Alarm.py
                 with open('Alarm1Active.pickle', 'wb') as f:
