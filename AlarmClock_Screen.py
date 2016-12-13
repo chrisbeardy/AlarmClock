@@ -250,7 +250,7 @@ def main():
                 lcd.message(temp + chr(223) + 'C') #chr(223) is degree sign
                 lcd.set_cursor(3,1)
                 lcd.message(date)
-                sleep(0.25)
+                sleep(0.5) #preserve processor
 
                 #trigger event for backlight
                 GPIO.setmode(GPIO.BCM)
