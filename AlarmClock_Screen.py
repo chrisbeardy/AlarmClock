@@ -14,6 +14,7 @@ It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 """
 from time import sleep, strftime
 from datetime import datetime
+from array import array
 import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
@@ -87,6 +88,29 @@ def Get_Date():
     finally:
         GPIO.cleanup()
 
+def _Display_AlarmTime(Hour, Min, Alarm_Number):
+    """
+    _Display_AlarmTime Method:
+    This is a method of Set_AlarmTime fucntion, it is responsible for displaying
+    the alarm time on the LCD
+
+    Args: Hour, Min, Alarm_Number
+
+    Return: None
+    """
+    try:
+        lcd.clear()
+        lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
+        lcd.message(str(Hour))
+        lcd.set_cursor(2,1)
+        lcd.message(':')
+        lcd.set_cursor(3,1)
+        lcd.message(str(Min))
+    except KeyboardInterrupt:
+        print ('KeyboardInterrupt in Method _Display_AlarmTime')
+    finally:
+        GPIO_Cleanup()
+
 def Set_AlarmTime(Hour, Min, Sec, Alarm_Number):
     """
     Set_AlarmTime Function:
@@ -97,45 +121,49 @@ def Set_AlarmTime(Hour, Min, Sec, Alarm_Number):
 
     Return: Hour, Min, Sec
     """
-    lcd.set_backlight(1)
-    lcd.clear()
-    lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
-    lcd.message(str(Hour)+':'+str(Min))
-    Cycle = True
-    while Cycle:
-        if lcd.is_pressed(LCD.UP):
-            Hour += 1
-            lcd.clear()
-            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
-            lcd.message(str(Hour)+':'+str(Min))
-        elif lcd.is_pressed(LCD.DOWN):
-            Hour -= 1
-            lcd.clear()
-            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
-            lcd.message(str(Hour)+':'+str(Min))
-        elif lcd.is_pressed(LCD.SELECT):
-            Cycle = False
-            sleep(0.5)
+    try:
+        lcd.set_backlight(1)
+        _Display_AlarmTime(Hour, Min, Alarm_Number)
 
-    Cycle = True
-    while Cycle:
-        if lcd.is_pressed(LCD.UP):
-            Min += 1
-            lcd.clear()
-            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
-            lcd.message(str(Hour)+':'+str(Min))
-        elif lcd.is_pressed(LCD.DOWN):
-            Min -= 1
-            lcd.clear()
-            lcd.message('Alarm ' + str(Alarm_Number) + ' Time:\n' )
-            lcd.message(str(Hour)+':'+str(Min))
-        elif lcd.is_pressed(LCD.SELECT):
-            Cycle = False
-            sleep(0.5)
+        #ideally want to use for loop here but can't as won't display hour and min
+        #   correctly
+        Cycle = True
+        while Cycle:
+            lcd.set_cursor(0,1)
+            lcd.blink(True) # start blinking cursor so user knows what they are changing
+            if lcd.is_pressed(LCD.UP):
+                Hour += 1
+                _Display_AlarmTime(Hour, Min, Alarm_Number)
+            elif lcd.is_pressed(LCD.DOWN):
+                Hour -= 1
+                lcd.clear()
+                _Display_AlarmTime(Hour, Min, Alarm_Number)
+            elif lcd.is_pressed(LCD.SELECT):
+                Cycle = False
+                sleep(0.5)
 
-    lcd.clear()
-    lcd.set_backlight(0)
-    return Hour, Min, Sec
+        Cycle = True
+        while Cycle:
+            lcd.set_cursor(3,1)
+            if lcd.is_pressed(LCD.UP):
+                Min += 1
+                _Display_AlarmTime(Hour, Min, Alarm_Number)
+            elif lcd.is_pressed(LCD.DOWN):
+                Min -= 1
+                _Display_AlarmTime(Hour, Min, Alarm_Number)
+            elif lcd.is_pressed(LCD.SELECT):
+                Cycle = False
+                sleep(0.5)
+
+        lcd.clear()
+        lcd.blink(False)
+        lcd.set_backlight(0)
+        return Hour, Min, Sec
+    except KeyboardInterrupt:
+        print ('KeyboardInterrupt in Function Set_AlarmTime')
+    finally:
+        GPIO_Cleanup()
+
 
 def Get_AlarmTime(Hour, Min, Sec, Alarm_Number):
     """
@@ -217,28 +245,25 @@ def main():
     """
     try:
         #Intialise variables
-        Alarm1Active = False
-        Alarm2Active = False
-        Hour1 = 1
-        Min1 = 1
-        Sec1 = 0
-        Hour2 = 1
-        Min2 = 1
-        Sec2 = 0
+        AlarmActive = array('l',[False, False])
+        #alarm times
+        Hour = array('l',[1,1])
+        Min = array('l',[1,1])
+        Sec = array('l',[1,1])
 
         while True:
             if lcd.is_pressed(LCD.UP):
                 #trigger event to enable/disable alarm 1
-                Alarm1Active = F_AlarmOnOff(Alarm1Active, 1)
+                AlarmActive[0] = F_AlarmOnOff(AlarmActive[0], 1)
             elif lcd.is_pressed(LCD.DOWN):
                 #trigger event to enable/disable alarm 2
-                Alarm2Active = F_AlarmOnOff(Alarm2Active, 2)
+                AlarmActive[1] = F_AlarmOnOff(AlarmActive[1], 2)
             elif lcd.is_pressed(LCD.LEFT):
                 #trigger event to set alarm 1 time
-                Hour1, Min1, Sec1 = Set_AlarmTime(Hour1, Min1, Sec1, 1)
+                Hour[0], Min[0], Sec[0] = Set_AlarmTime(Hour[0], Min[0], Sec[0], 1)
             elif lcd.is_pressed(LCD.RIGHT):
                 #trigger event to set alarm 2 time
-                Hour2, Min2, Sec2 = Set_AlarmTime(Hour2, Min2, Sec2, 2)
+                Hour[1], Min[1], Sec[1] = Set_AlarmTime(Hour[1], Min[1], Sec[1], 2)
             else:
                 #Main Screen
                 ActualTime, ActualTimeDisplay = Get_ActualTime()
@@ -261,16 +286,16 @@ def main():
                 #setup pickles here to pass data to AlarmClock_Alarm.py
                 with open('Alarm1Active.pickle', 'wb') as f:
                     # Pickle the 'data' using the highest protocol available.
-                    pickle.dump(Alarm1Active, f, pickle.HIGHEST_PROTOCOL)
+                    pickle.dump(AlarmActive[0], f, pickle.HIGHEST_PROTOCOL)
                 with open('Alarm2Active.pickle', 'wb') as f2:
                     # Pickle the 'data' using the highest protocol available.
-                    pickle.dump(Alarm2Active, f2, pickle.HIGHEST_PROTOCOL)
+                    pickle.dump(AlarmActive[1], f2, pickle.HIGHEST_PROTOCOL)
                 with open('AlarmTime1.pickle.', 'wb') as f3:
-                    AlarmTime1 = Get_AlarmTime(Hour1, Min1, Sec1, 1)
+                    AlarmTime1 = Get_AlarmTime(Hour[0], Min[0], Sec[0], 1)
                     # Pickle the 'data' using the highest protocol available.
                     pickle.dump(AlarmTime1, f3, pickle.HIGHEST_PROTOCOL)
                 with open('AlarmTime2.pickle.', 'wb') as f4:
-                    AlarmTime2 = Get_AlarmTime(Hour2, Min2, Sec2, 2)
+                    AlarmTime2 = Get_AlarmTime(Hour[1], Min[1], Sec[1], 2)
                     # Pickle the 'data' using the highest protocol available.
                     pickle.dump(AlarmTime2, f4, pickle.HIGHEST_PROTOCOL)
 
