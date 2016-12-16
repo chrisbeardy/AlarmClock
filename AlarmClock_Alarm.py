@@ -21,6 +21,8 @@ GPIO.setup(21, GPIO.OUT, initial = 0)
 GPIO.setup(20, GPIO.OUT, initial = 0)
 GPIO.setup(8, GPIO.IN)
 GPIO.setup(7, GPIO.IN)
+
+
 def Get_ActualTime():
     """
     Get_ActualTime Function:

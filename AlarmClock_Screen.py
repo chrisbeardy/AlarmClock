@@ -20,7 +20,7 @@ import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(25, GPIO.IN)
+GPIO.setup(25, GPIO.IN, pull_up_down = GPIO.PUD_DOWN )
 
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
@@ -282,10 +282,6 @@ def main():
                 lcd.set_cursor(3,1)
                 lcd.message(date)
                 sleep(0.5) #preserve processor
-
-                #trigger event for backlight
-                # if GPIO.input(25):
-                #     F_BackLightON()
 
                 #setup pickles here to pass data to AlarmClock_Alarm.py
                 with open('Alarm1Active.pickle', 'wb') as f:
