@@ -19,6 +19,9 @@ import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(25, GPIO.IN)
+
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
 #set initial background colour
@@ -45,8 +48,9 @@ def Get_Temperature():
         return temp
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_Temperature')
-    finally:
         GPIO.cleanup()
+        quit()
+
 
 def Get_ActualTime():
     """
@@ -68,8 +72,8 @@ def Get_ActualTime():
         return ActualTime, ActualTimeDisplay
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_ActualTime')
-    finally:
         GPIO.cleanup()
+        quit()
 
 def Get_Date():
     """
@@ -85,8 +89,8 @@ def Get_Date():
         return Date
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_Date')
-    finally:
         GPIO.cleanup()
+        quit()
 
 def _Display_AlarmTime(Hour, Min, Alarm_Number):
     """
@@ -108,8 +112,8 @@ def _Display_AlarmTime(Hour, Min, Alarm_Number):
         lcd.message(str(Min))
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Method _Display_AlarmTime')
-    finally:
-        GPIO_Cleanup()
+        GPIO.cleanup()
+        quit()
 
 def Set_AlarmTime(Hour, Min, Sec, Alarm_Number):
     """
@@ -161,8 +165,8 @@ def Set_AlarmTime(Hour, Min, Sec, Alarm_Number):
         return Hour, Min, Sec
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Set_AlarmTime')
-    finally:
-        GPIO_Cleanup()
+        GPIO.cleanup()
+        quit()
 
 
 def Get_AlarmTime(Hour, Min, Sec, Alarm_Number):
@@ -181,11 +185,11 @@ def Get_AlarmTime(Hour, Min, Sec, Alarm_Number):
         return AlarmTime
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function Get_AlarmTime')
-    finally:
         GPIO.cleanup()
+        quit()
 
 
-def F_BackLightON():
+def F_BackLightON(channel):
     """
     F_BackLightON function:
     Function to turn LCD backlight on for a duration of time
@@ -200,9 +204,11 @@ def F_BackLightON():
         lcd.set_backlight(0)
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function F_BackLightON')
-    finally:
         GPIO.cleanup()
+        quit()
 
+#trigger event for backlight
+GPIO.add_event_detect(25, GPIO.RISING, callback=F_BackLightON, bouncetime=300)
 
 def F_AlarmOnOff(AlarmActive, Alarm_Number):
     """
@@ -235,8 +241,8 @@ def F_AlarmOnOff(AlarmActive, Alarm_Number):
             return AlarmActive
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function F_AlarmOnOff')
-    finally:
         GPIO.cleanup()
+        quit()
 
 def main():
     """
@@ -278,10 +284,8 @@ def main():
                 sleep(0.5) #preserve processor
 
                 #trigger event for backlight
-                GPIO.setmode(GPIO.BCM)
-                GPIO.setup(25, GPIO.IN)
-                if GPIO.input(25):
-                    F_BackLightON()
+                # if GPIO.input(25):
+                #     F_BackLightON()
 
                 #setup pickles here to pass data to AlarmClock_Alarm.py
                 with open('Alarm1Active.pickle', 'wb') as f:
@@ -290,19 +294,19 @@ def main():
                 with open('Alarm2Active.pickle', 'wb') as f2:
                     # Pickle the 'data' using the highest protocol available.
                     pickle.dump(AlarmActive[1], f2, pickle.HIGHEST_PROTOCOL)
-                with open('AlarmTime1.pickle.', 'wb') as f3:
+                with open('AlarmTime1.pickle', 'wb') as f3:
                     AlarmTime1 = Get_AlarmTime(Hour[0], Min[0], Sec[0], 1)
                     # Pickle the 'data' using the highest protocol available.
                     pickle.dump(AlarmTime1, f3, pickle.HIGHEST_PROTOCOL)
-                with open('AlarmTime2.pickle.', 'wb') as f4:
+                with open('AlarmTime2.pickle', 'wb') as f4:
                     AlarmTime2 = Get_AlarmTime(Hour[1], Min[1], Sec[1], 2)
                     # Pickle the 'data' using the highest protocol available.
                     pickle.dump(AlarmTime2, f4, pickle.HIGHEST_PROTOCOL)
 
     except KeyboardInterrupt:
         print('KeyboardInterrupt in Main')
-    finally:
         GPIO.cleanup()
+        quit()
 
 if __name__ == '__main__':
     main()
