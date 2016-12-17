@@ -200,7 +200,7 @@ def F_BackLightON(channel):
     """
     try:
         lcd.set_backlight(1)
-        sleep(8)
+        sleep(5)
         lcd.set_backlight(0)
     except KeyboardInterrupt:
         print ('KeyboardInterrupt in Function F_BackLightON')

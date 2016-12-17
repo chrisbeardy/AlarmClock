@@ -19,8 +19,8 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(21, GPIO.OUT, initial = 0)
 GPIO.setup(20, GPIO.OUT, initial = 0)
-GPIO.setup(8, GPIO.IN)
-GPIO.setup(7, GPIO.IN)
+GPIO.setup(8, GPIO.IN, pull_up_down = GPIO.PUD_DOWN )
+GPIO.setup(7, GPIO.IN, pull_up_down = GPIO.PUD_DOWN )
 
 
 def Get_ActualTime():
@@ -137,6 +137,8 @@ def F_Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, 
     try:
         print('AlarmTime:' + str(AlarmTime))
         print('ActualTime:' + str(ActualTime))
+        print (AlarmHappened)
+        print (AlarmButtonPressed)
         # if the alarm has gone off and then the user deactivates it sleep for 20 mins
         if AlarmButtonPressed and AlarmHappened:
             Buzzer = False
@@ -212,12 +214,13 @@ def F_Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, 
         GPIO.cleanup()
         quit()
 
-def F_Alarm1ButtonPressed(channel):
+def F_Alarm1ButtonPressed():
     Alarm1ButtonPressed = True
+    print ('Button Pressed')
     return Alarm1ButtonPressed
 
-#trigger event for alarm deactivation
-GPIO.add_event_detect(8, GPIO.RISING, callback=F_Alarm1ButtonPressed, bouncetime=300)
+# #trigger event for alarm deactivation
+# GPIO.add_event_detect(8, GPIO.RISING, callback=F_Alarm1ButtonPressed, bouncetime=300)
 
 
 def F_Alarm2ButtonPressed(channel):
@@ -256,6 +259,8 @@ def main():
                 Alarm_Number = 1
                 Alarm1Time = Get_AlarmTime_in_Seconds(Alarm1Time, Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
+                if GPIO.input(8):
+                    Alarm1ButtonPressed = F_Alarm1ButtonPressed()
                 [Alarm1_Happened, Alarm1ButtonPressed, LEDFlash, Buzzer] = F_Alarm_Active(Alarm1Time, ActualTime, \
                     Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened)
             else:
