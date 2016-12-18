@@ -152,6 +152,7 @@ def F_Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, 
         # the alarm can never go off as 24hr clock so actual time will cycle round at midnight
         elif ActualTime >= (AlarmTime + (10*60)):
             AlarmHappened = False
+            AlarmButtonPressed = False
             Buzzer = False
             LEDFlash = False
             GPIO_Call(Buzzer, LEDFlash)
@@ -201,9 +202,11 @@ def F_Alarm_Active(AlarmTime, ActualTime, AlarmButtonPressed, LEDFlash, Buzzer, 
             sleep(0.5)
         # set condition for sleeping alarm if over 10 mins to go
         elif (ActualTime < (AlarmTime - (10*60))):
+            AlarmButtonPressed = False
             sleep(1) # preserve processor
             print('7')
         else:
+            AlarmButtonPressed = False
             sleep(0.5)# preserve processor
             print('8')
 
@@ -219,16 +222,15 @@ def F_Alarm1ButtonPressed():
     print ('Button Pressed')
     return Alarm1ButtonPressed
 
-#trigger event for alarm deactivation
+# #trigger event for alarm deactivation
 GPIO.add_event_detect(8, GPIO.RISING, bouncetime=300)
-
 
 def F_Alarm2ButtonPressed(channel):
     Alarm2ButtonPressed = True
     return Alarm2ButtonPressed
 
 #trigger event for alarm deactivation
-GPIO.add_event_detect(7, GPIO.RISING, callback=F_Alarm2ButtonPressed, bouncetime=300)
+GPIO.add_event_detect(7, GPIO.RISING, bouncetime=300)
 
 def main():
     """
@@ -261,8 +263,6 @@ def main():
                 ActualTime = Get_ActualTime_in_Seconds()
                 if GPIO.event_detected(8):
                     Alarm1ButtonPressed = F_Alarm1ButtonPressed()
-                # if GPIO.input(8):
-                #     Alarm1ButtonPressed = F_Alarm1ButtonPressed()
                 [Alarm1_Happened, Alarm1ButtonPressed, LEDFlash, Buzzer] = F_Alarm_Active(Alarm1Time, ActualTime, \
                     Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened)
             else:
@@ -278,6 +278,8 @@ def main():
                 Alarm_Number = 2
                 Alarm2Time = Get_AlarmTime_in_Seconds(Alarm2Time, Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
+                if GPIO.event_detected(7):
+                    Alarm2ButtonPressed = F_Alarm2ButtonPressed()
                 [Alarm2_Happened, Alarm2ButtonPressed, LEDFlash, Buzzer] = F_Alarm_Active(Alarm2Time, ActualTime, \
                     Alarm2ButtonPressed, LEDFlash, Buzzer, Alarm2_Happened)
             else:
