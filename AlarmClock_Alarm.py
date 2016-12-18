@@ -257,7 +257,7 @@ def main():
             except EOFError:
                 Alarm1Active = Alarm1Active
 
-            if Alarm1Active:
+            if Alarm1Active or Alarm1_Happened:
                 Alarm_Number = 1
                 Alarm1Time = Get_AlarmTime_in_Seconds(Alarm1Time, Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
@@ -274,7 +274,7 @@ def main():
             except EOFError:
                 Alarm2Active = Alarm2Active
 
-            if Alarm2Active:
+            if Alarm2Active or Alarm2_Happened:
                 Alarm_Number = 2
                 Alarm2Time = Get_AlarmTime_in_Seconds(Alarm2Time, Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
