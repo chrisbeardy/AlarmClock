@@ -219,8 +219,8 @@ def F_Alarm1ButtonPressed():
     print ('Button Pressed')
     return Alarm1ButtonPressed
 
-# #trigger event for alarm deactivation
-# GPIO.add_event_detect(8, GPIO.RISING, callback=F_Alarm1ButtonPressed, bouncetime=300)
+#trigger event for alarm deactivation
+GPIO.add_event_detect(8, GPIO.RISING, bouncetime=300)
 
 
 def F_Alarm2ButtonPressed(channel):
@@ -259,8 +259,10 @@ def main():
                 Alarm_Number = 1
                 Alarm1Time = Get_AlarmTime_in_Seconds(Alarm1Time, Alarm_Number)
                 ActualTime = Get_ActualTime_in_Seconds()
-                if GPIO.input(8):
+                if GPIO.event_detected(8):
                     Alarm1ButtonPressed = F_Alarm1ButtonPressed()
+                # if GPIO.input(8):
+                #     Alarm1ButtonPressed = F_Alarm1ButtonPressed()
                 [Alarm1_Happened, Alarm1ButtonPressed, LEDFlash, Buzzer] = F_Alarm_Active(Alarm1Time, ActualTime, \
                     Alarm1ButtonPressed, LEDFlash, Buzzer, Alarm1_Happened)
             else:
