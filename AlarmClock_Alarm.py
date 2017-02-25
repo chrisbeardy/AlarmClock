@@ -210,7 +210,7 @@ def F_AlarmButtonPressed():
     Buzzer = False
     LEDFlash = True
     GPIO_Call(Buzzer, LEDFlash)
-    Sleep(0.5)
+    sleep(0.5)
     Buzzer = False
     LEDFlash = False
     GPIO_Call(Buzzer, LEDFlash)
