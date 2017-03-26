@@ -15,12 +15,18 @@ It is also shared under the GNU GENERAL PUBLIC LICENSE Version 3
 from time import sleep, strftime
 from datetime import datetime
 from array import array
+import os
+import time
 import pickle
 import Adafruit_CharLCD as LCD
 import Adafruit_MCP9808.MCP9808 as MCP9808
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(25, GPIO.IN, pull_up_down = GPIO.PUD_DOWN )
+
+#intialise timezone
+os.environ['TZ'] = 'Europe/London'
+time.tzset()
 
 #intialise LCD
 lcd = LCD.Adafruit_CharLCDPlate()
@@ -43,7 +49,7 @@ def Get_Temperature():
     Return: Temperature (as string)
     """
     try:
-        temp = sensor.readTempC()
+        temp = sensor.readTempC() - 3 # - 3 just as compensation as appears to read highish
         temp = str('%.0f' % temp) # convert to string of 0 decimal places
         return temp
     except KeyboardInterrupt:
