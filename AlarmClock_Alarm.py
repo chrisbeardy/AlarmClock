@@ -23,30 +23,6 @@ GPIO.setup(20, GPIO.OUT, initial = 0)
 GPIO.setup(8, GPIO.IN, pull_up_down = GPIO.PUD_DOWN )
 GPIO.setup(7, GPIO.IN, pull_up_down = GPIO.PUD_DOWN )
 
-
-#def Get_ActualTime():
-#    """
-#    Get_ActualTime Function:
-#    Function to get the actual time from the system, then seperate into
-#    a time for the display and a dictionary item for the time in
-#    individual hours, minutes and seconds
-#
-#    Args: None
-#
-#    Return: ActualTime,  ActualTimeDisplay
-#    """
-#    try:
-#        ActualTimeDisplay = datetime.now().strftime('%H:%M')
-#        Hour = int(datetime.now().strftime('%H'))
-#        Min = int(datetime.now().strftime('%M'))
-#        Sec = int(datetime.now().strftime('%S'))
-#        ActualTime = {'H':Hour, 'M':Min, 'S':Sec}
-#        return ActualTime, ActualTimeDisplay
-#    except KeyboardInterrupt:
-#        print ('KeyboardInterrupt in Function Get_ActualTime')
-#        GPIO.cleanup()
-#        quit()
-
 def Get_ActualTime_in_Seconds():
     """
     Get_ActualTime_in_Seconds Function:
